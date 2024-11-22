@@ -11,6 +11,11 @@ const dbPath = path.join(__dirname, 'database.json');
 // Каб парсіць JSON з цела запытаў
 app.use(express.json());
 
+// Маршрут для праверкі, ці працуе сервер
+app.get('/', (req, res) => {
+    res.send('Все добра, сервер працуе!');
+});
+
 // Маршрут для дадання новага карыстальніка
 app.post('/add-user', (req, res) => {
     const { username, password } = req.body;
