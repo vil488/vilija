@@ -12,7 +12,11 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Падключэнне да MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+require('dotenv').config();
+
+
+const uri = process.env.MONGODB_URI;
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Падключана да MongoDB'))
   .catch(err => console.log('Памылка падключэння:', err));
 
