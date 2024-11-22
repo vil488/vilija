@@ -15,31 +15,35 @@ app.use(bodyParser.json());
 require('dotenv').config();
 
 
-const uri = process.env.MONGODB_URI;
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Падключана да MongoDB'))
-  .catch(err => console.log('Памылка падключэння:', err));
+mongoose.connect('mongodb://localhost:27017/vilija')
+  .then(() => console.log('Падключана да базы дадзеных'))
+  .catch(err => console.error('Памылка падключэння:', err));
 
 // Рэгістрацыя карыстальніка
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    // Праверка, ці ўжо існуе карыстальнік
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.json({ success: false, message: 'Карыстальнік ужо існуе' });
     }
 
+    // Хэш пароля
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Захаванне карыстальніка ў базу
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
-    res.json({ success: true, message: 'Карыстальнік паспяхова зарэгістраваны!' });
+    res.json({ success: true, message: 'Карыстальнік паспяхова дададзены!' });
   } catch (error) {
     console.error(error);
-    res.json({ success: false, message: 'Памылка рэгістрацыі' });
+    res.json({ success: false, message: 'Памылка дадання карыстальніка' });
   }
 });
+
 
 // Лагін карыстальніка
 app.post('/login', async (req, res) => {
