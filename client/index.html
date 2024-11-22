@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vilija Chat</title>
+</head>
+<body>
+  <h1>Vilija Chat</h1>
+  <div id="messages"></div>
+  <input type="text" id="messageInput" placeholder="Type a message">
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    // Функцыя для адпраўкі паведамлення
+    async function sendMessage() {
+      const message = document.getElementById('messageInput').value;
+      if (message) {
+        const res = await fetch('http://localhost:5000/message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+        if (data.success) {
+          getMessages();  // Атрымліваем абноўленыя паведамленні
+        }
+      }
+    }
+
+    // Функцыя для атрымання паведамленняў
+    async function getMessages() {
+      const res = await fetch('http://localhost:5000/messages');
+      const messages = await res.json();
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.innerHTML = '';  // Ачышчаем
+      messages.forEach(msg => {
+        const messageElement = document.createElement('p');
+        messageElement.textContent = msg;
+        messagesDiv.appendChild(messageElement);
+      });
+    }
+
+    // Загружаем паведамленні пры запуску
+    window.onload = getMessages;
+  </script>
+</body>
+</html>
