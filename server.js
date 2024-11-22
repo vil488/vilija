@@ -1,73 +1,70 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const cors = require('cors');
-const User = require('./userModel'); // Падключэнне да мадэлі карыстальніка
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000; // Render аўтаматычна надае PORT
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(bodyParser.json());
+// Шлях да файла базы
+const dbPath = path.join(__dirname, 'database.json');
 
-// Падключэнне да MongoDB Atlas
-require('dotenv').config();
+// Каб парсіць JSON з цела запытаў
+app.use(express.json());
 
+// Маршрут для дадання новага карыстальніка
+app.post('/add-user', (req, res) => {
+    const { username, password } = req.body;
 
-mongoose.connect('mongodb://localhost:27017/vilija')
-  .then(() => console.log('Падключана да базы дадзеных'))
-  .catch(err => console.error('Памылка падключэння:', err));
-
-// Рэгістрацыя карыстальніка
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    // Праверка, ці ўжо існуе карыстальнік
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.json({ success: false, message: 'Карыстальнік ужо існуе' });
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    // Хэш пароля
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Загружаем дадзеныя з файла
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+        if (err) return res.status(500).json({ message: 'Server error' });
 
-    // Захаванне карыстальніка ў базу
-    const newUser = new User({ username, password: hashedPassword });
-    await newUser.save();
+        const users = JSON.parse(data || '[]'); // Калі файл пусты, пераўтвараем у пусты масіў
 
-    res.json({ success: true, message: 'Карыстальнік паспяхова дададзены!' });
-  } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: 'Памылка дадання карыстальніка' });
-  }
+        // Правяраем, ці ўжо існуе карыстальнік
+        const userExists = users.some((user) => user.username === username);
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Дадаем новага карыстальніка
+        users.push({ username, password });
+
+        // Запісваем у файл
+        fs.writeFile(dbPath, JSON.stringify(users, null, 2), (err) => {
+            if (err) return res.status(500).json({ message: 'Failed to save user' });
+            res.status(201).json({ message: 'User added successfully' });
+        });
+    });
 });
 
+// Маршрут для праверкі лагіна
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
 
-// Лагін карыстальніка
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.json({ success: false, message: 'Няправільны лагін ці пароль' });
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (isMatch) {
-      res.json({ success: true, message: 'Лагін паспяховы!' });
-    } else {
-      res.json({ success: false, message: 'Няправільны лагін ці пароль' });
-    }
-  } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: 'Памылка з лагінам' });
-  }
+    // Загружаем дадзеныя з файла
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+        if (err) return res.status(500).json({ message: 'Server error' });
+
+        const users = JSON.parse(data || '[]');
+        const user = users.find((u) => u.username === username && u.password === password);
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        res.status(200).json({ message: 'Login successful' });
+    });
 });
 
-// Запуск сервера
 app.listen(PORT, () => {
-  console.log(`Сервер працуе на порце ${PORT}`);
+    console.log(`Сервер працуе на порце ${PORT}`);
 });
