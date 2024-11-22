@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 // Шлях да файла базы
 const dbPath = path.join(__dirname, 'database.json');
@@ -50,6 +50,7 @@ app.post('/add-user', (req, res) => {
 // Маршрут для праверкі лагіна
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
+    console.log("Received request to login");
 
     if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });
