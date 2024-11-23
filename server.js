@@ -14,7 +14,7 @@ app.use(express.json()); // Для апрацоўкі JSON-запытаў
 
 // Чытаем карыстальнікаў з db.json
 const getUsers = () => {
-  const data = fs.readFileSync('db.json', 'utf8');
+  const data = fs.readFileSync('./db.json', 'utf8');
   return JSON.parse(data);
 };
 
