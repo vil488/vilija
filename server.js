@@ -34,7 +34,7 @@ const getUsers = () => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  const hashedPassword = '$2a$10$CwTycUXWue0Thq9StjUM0uJ8z8dr3.o8ffbvw3S6iRRAJdBXoGheW'; // Зашыфраваны пароль
+  const hashedPassword = '$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW'; // Зашыфраваны пароль
   const passwordToCheck = password; 
 
     bcrypt.compare(passwordToCheck, hashedPassword, (err, isMatch) => {
