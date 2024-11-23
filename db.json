@@ -1,7 +1,13 @@
 [
     {
-      "username": "john_doe",
-      "password": "$2a$10$Dow1jvU3xYOXy/jVLUuE..FKF9Fr5DQgZ91FiOCw5kbbFxPcJZwi6" 
+      "id": 1,
+      "username": "testuser",
+      "password": "$2a$10$CwTycUXWue0Thq9StjUM0uJ8z8dr3.o8ffbvw3S6iRRAJdBXoGheW" 
+    },
+    {
+      "id": 2,
+      "username": "admin",
+      "password": "$2a$10$7eSRxJb5Mqs5V5i6vTA2cOi.kE1.IkW/qlR94v0TTOJecjDhCuZua"
     }
-  ]
+]
   
