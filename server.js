@@ -6,7 +6,10 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 3000; // Змяніце порт пры неабходнасці
-const SECRET_KEY = 'your_secret_key'; // Замяніце на надзейны ключ
+
+require('dotenv').config();
+const SECRET_KEY = process.env.SECRET_KEY;
+
 
 // Сярэдзіны
 app.use(cors({ 

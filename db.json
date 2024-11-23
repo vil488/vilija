@@ -2,12 +2,8 @@
     {
       "id": 1,
       "username": "testuser",
-      "password": "$2a$10$CwTycUXWue0Thq9StjUM0uJ8z8dr3.o8ffbvw3S6iRRAJdBXoGheW" 
-    },
-    {
-      "id": 2,
-      "username": "admin",
       "password": "$2a$10$CwTycUXWue0Thq9StjUM0uJ8z8dr3.o8ffbvw3S6iRRAJdBXoGheW"
     }
 ]
+  
   
