@@ -105,32 +105,31 @@ io.use((socket, next) => {
 });
 
 // WebSocket events
+// WebSocket events
 io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.user.username}`);
+    console.log(`User connected: ${socket.user.username}`);
 
-  // Send chat history to the new connection
-  const chatHistory = getChatMessages();
-  socket.emit('chat history', chatHistory);
+    // Адпраўляем гісторыю чата новаму падключэнню
+    const chatHistory = getChatMessages();
+    socket.emit('chat history', chatHistory);
 
-  // Handle incoming messages
-  socket.on('message', (data) => {
-    if (!data || !data.text) {
-      console.error('Received invalid message data');
-      return;
-    }
+    // Абработка ўваходных паведамленняў
+    socket.on('message', (data) => {
+        const message = {
+            sender: socket.user.username,
+            text: data.text,
+            timestamp: new Date().toISOString(),
+        };
 
-    const message = {
-      sender: socket.user.username,
-      text: data.text,
-      timestamp: new Date().toISOString(),
-    };
+        const messages = getChatMessages();
+        messages.push(message);
+        saveChatMessages(messages);
 
-    const messages = getChatMessages();
-    messages.push(message);
-    saveChatMessages(messages);
+        io.emit('message', message); // Рассылаем паведамленне ўсім падключаным кліентам
+    });
 
-    io.emit('message', message); // Broadcast message to all connected clients
-  });
+    
+
 
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.user.username}`);
