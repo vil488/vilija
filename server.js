@@ -25,9 +25,26 @@ const getUsers = () => {
   return JSON.parse(data);
 };
 
+
+
+
+
+
 // Роўт для лагіна
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
+
+  const hashedPassword = '$2a$10$CwTycUXWue0Thq9StjUM0uJ8z8dr3.o8ffbvw3S6iRRAJdBXoGheW'; // Зашыфраваны пароль
+  const passwordToCheck = password; 
+
+    bcrypt.compare(passwordToCheck, hashedPassword, (err, isMatch) => {
+    if (err) throw err;
+    if (isMatch) {
+        console.log('Паролі супадаюць');
+    } else {
+        console.log('Паролі не супадаюць');
+    }
+    });
 
   try {
     if (!username || !password) {
