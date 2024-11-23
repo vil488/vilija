@@ -40,12 +40,20 @@ const getUsers = () => {
 
 // Chat functionality
 const getChatMessages = () => {
+  // Пераканаемся, што файл існуе, калі не, ствараем яго
   if (!fs.existsSync('./dbc.json')) {
     fs.writeFileSync('./dbc.json', JSON.stringify({ messages: [] }, null, 2));
   }
 
   try {
     const data = fs.readFileSync('./dbc.json', 'utf8');
+    console.log('File content:', data); // Лагуем змест файла
+
+    // Калі файл пусты, вяртаем пусты масіў
+    if (!data) {
+      return [];
+    }
+
     const db = JSON.parse(data);
     return db.messages || [];
   } catch (err) {
@@ -56,7 +64,12 @@ const getChatMessages = () => {
 
 const saveChatMessages = (messages) => {
   const data = { messages };
-  fs.writeFileSync('./dbc.json', JSON.stringify(data, null, 2));
+
+  try {
+    fs.writeFileSync('./dbc.json', JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('Error saving chat messages:', err);
+  }
 };
 
 // Login route
@@ -106,56 +119,51 @@ io.use((socket, next) => {
 });
 
 // WebSocket events
-// WebSocket events
 io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.user.username}`);
+  console.log(`User connected: ${socket.user.username}`);
 
-    // Адпраўляем гісторыю чата новаму падключэнню
-    const chatHistory = getChatMessages();
-    socket.emit('chat history', chatHistory);
+  // Адпраўляем гісторыю чата новаму падключэнню
+  const chatHistory = getChatMessages();
+  socket.emit('chat history', chatHistory);
 
-    // Абработка ўваходных паведамленняў
-    socket.on('message', (data) => {
-        const message = {
-            sender: socket.user.username,
-            text: data.text,
-            timestamp: new Date().toISOString(),
-        };
+  // Абработка ўваходных паведамленняў
+  socket.on('message', (data) => {
+    const message = {
+      sender: socket.user.username,
+      text: data.text,
+      timestamp: new Date().toISOString(),
+      color: socket.user.color, // Дадаем колер карыстальніка да паведамлення
+    };
 
-        const messages = getChatMessages();
-        messages.push(message);
-        saveChatMessages(messages);
+    const messages = getChatMessages();
+    messages.push(message);
+    saveChatMessages(messages);
 
-        io.emit('message', message); // Рассылаем паведамленне ўсім падключаным кліентам
-    });
+    io.emit('message', message); // Рассылаем паведамленне ўсім падключаным кліентам
+  });
 
-    
-
-
-
-
+  // Выход з чата
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.user.username}`);
   });
 });
 
+// Маршрут для ачысткі ўсіх паведамленняў
+app.delete('/clearMessages', (req, res) => {
+  try {
+    // Ачышчаем ўсе паведамленні
+    const data = { messages: [] };
+    fs.writeFileSync('./dbc.json', JSON.stringify(data, null, 2));
+
+    // Адпраўляем адказ
+    res.status(200).json({ success: true, message: 'Паведамленні былі выдаленыя' });
+  } catch (err) {
+    console.error('Error clearing messages:', err);
+    res.status(500).json({ success: false, message: 'Не ўдалося выдаліць паведамленні' });
+  }
+});
+
 // Start server
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-
-// Маршрут для ачысткі ўсіх паведамленняў
-app.delete('/clearMessages', (req, res) => {
-    try {
-        // Ачышчаем ўсе паведамленні
-        const data = { messages: [] };
-        fs.writeFileSync('./dbc.json', JSON.stringify(data, null, 2));
-
-        // Адпраўляем адказ
-        res.status(200).json({ success: true, message: 'Паведамленні былі выдаленыя' });
-    } catch (err) {
-        console.error('Error clearing messages:', err);
-        res.status(500).json({ success: false, message: 'Не ўдалося выдаліць паведамленні' });
-    }
 });
