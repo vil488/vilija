@@ -1,106 +1,72 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const path = require('path');
+const cors = require('cors'); // Для падтрымкі запытаў з фронтэнда
 
 const app = express();
-const PORT = process.env.PORT || 5000; // Вызначаем порт для Render або лакальна
+const PORT = 3000;
+const SECRET_KEY = 'your_secret_key'; // Замяніце на надзейны ключ
 
-// Шлях да файла базы
-const dbPath = path.join(__dirname, 'database.json');
+// Сярэдзіны
+app.use(cors({ origin: 'https://vilijaclient.onrender.com' })); // Дазваляем фронтэнд дамен
+app.use(express.json()); // Для апрацоўкі JSON-запытаў
 
-// Каб парсіць JSON з цела запытаў
-app.use(express.json());
+// Чытаем карыстальнікаў з db.json
+const getUsers = () => {
+  const data = fs.readFileSync('db.json', 'utf8');
+  return JSON.parse(data);
+};
 
-// Маршрут для праверкі, ці працуе сервер
-app.get('/', (req, res) => {
-    res.send('Все добра, сервер працуе!');
-});
+// Роўт для лагіна
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
 
-// Маршрут для дадання новага карыстальніка
-app.post('/add-user', (req, res) => {
-    const { username, password } = req.body;
-
-    console.log("Received request to add user");
-
+  try {
     if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
+      return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    // Загружаем дадзеныя з файла
-    fs.readFile(dbPath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err);
-            return res.status(500).json({ message: 'Server error' });
-        }
+    const users = getUsers();
+    const user = users.find((u) => u.username === username);
 
-        let users = [];
-        try {
-            users = JSON.parse(data || '[]'); // Калі файл пусты, пераўтвараем у пусты масіў
-        } catch (parseError) {
-            console.error('Error parsing JSON data:', parseError);
-            return res.status(500).json({ message: 'Error parsing user data' });
-        }
-
-        // Правяраем, ці ўжо існуе карыстальнік
-        const userExists = users.some((user) => user.username === username);
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        // Дадаем новага карыстальніка
-        users.push({ username, password });
-
-        // Запісваем у файл
-        fs.writeFile(dbPath, JSON.stringify(users, null, 2), (err) => {
-            if (err) {
-                console.error('Error saving user:', err);
-                return res.status(500).json({ message: 'Failed to save user' });
-            }
-            console.log('User added successfully');
-            res.status(201).json({ message: 'User added successfully' });
-        });
-    });
-});
-
-// Маршрут для праверкі лагіна
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    console.log("Received request to login");
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Загружаем дадзеныя з файла
-    fs.readFile(dbPath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err);
-            return res.status(500).json({ message: 'Server error' });
-        }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-        let users = [];
-        try {
-            users = JSON.parse(data || '[]');
-        } catch (parseError) {
-            console.error('Error parsing JSON data:', parseError);
-            return res.status(500).json({ message: 'Error parsing user data' });
-        }
-
-        const user = users.find((u) => u.username === username && u.password === password);
-
-        if (!user) {
-            console.log('Invalid login attempt');
-            return res.status(401).json({ message: 'Invalid username or password' });
-        }
-
-        console.log('Login successful');
-        res.status(200).json({ message: 'Login successful' });
-    });
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+    res.status(200).json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-// Пераканаемся, што слухаем на правільным порце і хостынгу
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Сервер працуе на порце ${PORT}`);
+// Роўт для абароненага кантэнту
+app.get('/protected', (req, res) => {
+  const authHeader = req.headers['authorization'];
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Authorization header required' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    res.status(200).json({ message: 'Protected content', user: decoded });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ message: 'Invalid or expired token' });
+  }
 });
 
+// Запуск сервера
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
