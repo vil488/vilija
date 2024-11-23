@@ -11,7 +11,7 @@ const server = http.createServer(app); // Create HTTP server
 const io = require('socket.io')(server, {
     cors: {
         origin: 'https://vilijaclient.onrender.com',
-        methods: ['GET', 'POST'],
+        methods: ['GET', 'POST','DELETE'],
     },
 });
 
@@ -22,7 +22,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 // Middlewares
 app.use(cors({
   origin: 'https://vilijaclient.onrender.com',
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json()); // For parsing JSON requests
