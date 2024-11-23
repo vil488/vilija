@@ -3,6 +3,12 @@
       "id": 1,
       "username": "testuser",
       "password": "$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW"
+    },
+
+    {
+        "id":2,
+        "username":"testuser2",
+        "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW"
     }
 ]
   
