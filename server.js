@@ -8,16 +8,19 @@ const { Server } = require('socket.io'); // For WebSocket server
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server
-const io = new Server(server, {
-  cors: {
-    origin: 'https://vilijaclient.onrender.com', // Change to your client's domain
-    methods: ['GET', 'POST'],
-  },
+const io = require('socket.io')(server, {
+    cors: {
+        origin: 'https://vilijaclient.onrender.com',
+        methods: ['GET', 'POST'],
+    },
 });
 
 const PORT = 3000;
 require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY;
+
+
+
 
 // Middlewares
 app.use(cors({
