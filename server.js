@@ -40,27 +40,32 @@ const getUsers = () => {
 
 // Chat functionality
 const getChatMessages = () => {
-  // Пераканаемся, што файл існуе, калі не, ствараем яго
-  if (!fs.existsSync('./dbc.json')) {
-    fs.writeFileSync('./dbc.json', JSON.stringify({ messages: [] }, null, 2));
-  }
-
-  try {
-    const data = fs.readFileSync('./dbc.json', 'utf8');
-    console.log('File content:', data); // Лагуем змест файла
-
-    // Калі файл пусты, вяртаем пусты масіў
-    if (!data) {
+    const filePath = './dbc.json';
+  
+    // Праверка, ці існуе файл, і яго чытанне
+    if (!fs.existsSync(filePath)) {
+      // Калі файл не існуе, ствараем новы з пустым масівам паведамленняў
+      fs.writeFileSync(filePath, JSON.stringify({ messages: [] }, null, 2));
       return [];
     }
-
-    const db = JSON.parse(data);
-    return db.messages || [];
-  } catch (err) {
-    console.error('Error reading chat messages:', err);
-    return [];
-  }
-};
+  
+    try {
+      const data = fs.readFileSync(filePath, 'utf8');
+  
+      // Правяраем, ці ёсць дадзеныя ў файле
+      if (!data) {
+        return [];
+      }
+  
+      // Паспрабуем прачытаць і разбіць JSON
+      const db = JSON.parse(data);
+      return db.messages || [];  // Вяртаем паведамленні або пусты масіў
+    } catch (err) {
+      console.error('Error reading or parsing chat messages:', err);
+      return []; // Калі ўзнікае памылка пры разбіванні JSON, вяртаем пусты масіў
+    }
+  };
+  
 
 const saveChatMessages = (messages) => {
   const data = { messages };
