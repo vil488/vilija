@@ -10,7 +10,6 @@ const PORT = 3000; // Змяніце порт пры неабходнасці
 require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
-
 // Сярэдзіны
 app.use(cors({ 
   origin: 'https://vilijaclient.onrender.com', // Дазваляем запыты з вашага фронтэнда
@@ -25,32 +24,16 @@ const getUsers = () => {
   return JSON.parse(data);
 };
 
-
-
-
-
-
 // Роўт для лагіна
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-
-  const hashedPassword = '$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW'; // Зашыфраваны пароль
-  const passwordToCheck = password; 
-
-    bcrypt.compare(passwordToCheck, hashedPassword, (err, isMatch) => {
-    if (err) throw err;
-    if (isMatch) {
-        console.log('Паролі супадаюць');
-    } else {
-        console.log('Паролі не супадаюць');
-    }
-    });
 
   try {
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
 
+    // Чытаем усіх карыстальнікаў з db.json
     const users = getUsers();
     const user = users.find((u) => u.username === username);
 
@@ -58,11 +41,13 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Параўноўваем уведзены пароль з захаваным хэшам
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Генерацыя JWT
     const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '1h' });
     res.status(200).json({ token });
   } catch (err) {
