@@ -2,17 +2,21 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const cors = require('cors'); // Для падтрымкі запытаў з фронтэнда
+const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000; // Змяніце порт пры неабходнасці
 const SECRET_KEY = 'your_secret_key'; // Замяніце на надзейны ключ
 
 // Сярэдзіны
-app.use(cors({ origin: 'https://vilijaclient.onrender.com' })); // Дазваляем фронтэнд дамен
+app.use(cors({ 
+  origin: 'https://vilijaclient.onrender.com', // Дазваляем запыты з вашага фронтэнда
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json()); // Для апрацоўкі JSON-запытаў
 
-// Чытаем карыстальнікаў з db.json
+// Чытаем карыстальнікаў з файла db.json
 const getUsers = () => {
   const data = fs.readFileSync('./db.json', 'utf8');
   return JSON.parse(data);
@@ -39,7 +43,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '1h' });
     res.status(200).json({ token });
   } catch (err) {
     console.error(err);
