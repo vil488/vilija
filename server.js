@@ -80,8 +80,9 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '1h' });
-    res.status(200).json({ token });
+    const token = jwt.sign({ username: user.username, color: user.color }, SECRET_KEY, { expiresIn: '1h' });
+
+    res.status(200).json({ token, username: user.username, color: user.color });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -131,6 +132,8 @@ io.on('connection', (socket) => {
     
 
 
+
+
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.user.username}`);
   });
@@ -139,4 +142,20 @@ io.on('connection', (socket) => {
 // Start server
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+
+// Маршрут для ачысткі ўсіх паведамленняў
+app.delete('/clearMessages', (req, res) => {
+    try {
+        // Ачышчаем ўсе паведамленні
+        const data = { messages: [] };
+        fs.writeFileSync('./dbc.json', JSON.stringify(data, null, 2));
+
+        // Адпраўляем адказ
+        res.status(200).json({ success: true, message: 'Паведамленні былі выдаленыя' });
+    } catch (err) {
+        console.error('Error clearing messages:', err);
+        res.status(500).json({ success: false, message: 'Не ўдалося выдаліць паведамленні' });
+    }
 });

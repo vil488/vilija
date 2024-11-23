@@ -2,18 +2,21 @@
     {
       "id": 1,
       "username": "testuser",
-      "password": "$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW"
+      "password": "$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW",
+      "color": "#8B5DFF"
     },
 
     {
         "id":2,
         "username":"testuser2",
-        "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW"
+        "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW",
+        "color": "#AF47D2"
     },
     {
         "id":3,
         "username":"alice",
-        "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW"
+        "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW",
+        "color": "#FF3EA5"
     }
 ]
   
