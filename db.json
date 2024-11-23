@@ -1,10 +1,7 @@
 [
     {
-        "username": "user1",
-        "password": "password1"
-    },
-    {
-        "username": "user2",
-        "password": "password2"
+      "username": "john_doe",
+      "password": "$2a$10$Dow1jvU3xYOXy/jVLUuE..FKF9Fr5DQgZ91FiOCw5kbbFxPcJZwi6" 
     }
-]
+  ]
+  
