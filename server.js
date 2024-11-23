@@ -19,9 +19,6 @@ const PORT = 3000;
 require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
-
-
-
 // Middlewares
 app.use(cors({
   origin: 'https://vilijaclient.onrender.com',
@@ -32,8 +29,13 @@ app.use(express.json()); // For parsing JSON requests
 
 // Read users from db.json
 const getUsers = () => {
-  const data = fs.readFileSync('./db.json', 'utf8');
-  return JSON.parse(data);
+  try {
+    const data = fs.readFileSync('./db.json', 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Error reading users from db.json:', err);
+    return [];
+  }
 };
 
 // Chat functionality
@@ -41,9 +43,15 @@ const getChatMessages = () => {
   if (!fs.existsSync('./dbc.json')) {
     fs.writeFileSync('./dbc.json', JSON.stringify({ messages: [] }, null, 2));
   }
-  const data = fs.readFileSync('./dbc.json', 'utf8');
-  const db = JSON.parse(data);
-  return db.messages || [];
+
+  try {
+    const data = fs.readFileSync('./dbc.json', 'utf8');
+    const db = JSON.parse(data);
+    return db.messages || [];
+  } catch (err) {
+    console.error('Error reading chat messages:', err);
+    return [];
+  }
 };
 
 const saveChatMessages = (messages) => {
@@ -75,7 +83,7 @@ app.post('/login', async (req, res) => {
     const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: '1h' });
     res.status(200).json({ token });
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -106,6 +114,11 @@ io.on('connection', (socket) => {
 
   // Handle incoming messages
   socket.on('message', (data) => {
+    if (!data || !data.text) {
+      console.error('Received invalid message data');
+      return;
+    }
+
     const message = {
       sender: socket.user.username,
       text: data.text,
