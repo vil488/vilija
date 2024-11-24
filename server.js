@@ -134,11 +134,12 @@ io.on('connection', (socket) => {
   // Абработка ўваходных паведамленняў
   socket.on('message', (data) => {
     const message = {
-      sender: socket.user.username,
-      text: data.text,
-      timestamp: new Date().toISOString(),
-      color: socket.user.color, // Дадаем колер карыстальніка да паведамлення
+        sender: socket.user.username,
+        text: data.text,
+        color: socket.user.color,  // Дадаем колер карыстальніка да паведамлення
+        timestamp: new Date().toISOString(), 
     };
+    
 
     const messages = getChatMessages();
     messages.push(message);
