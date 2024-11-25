@@ -169,6 +169,41 @@ app.delete('/clearMessages', (req, res) => {
   }
 });
 
+
+
+const FILE_PATH = './dba.json';
+
+// Роўт для атрымання спісу ўсіх артыкулаў
+app.get('/articles', (req, res) => {
+    fs.readFile(FILE_PATH, 'utf-8', (err, data) => {
+        if (err) {
+            res.status(500).send({ error: 'Не ўдалося прачытаць файл' });
+            return;
+        }
+        const articles = JSON.parse(data);
+        res.send(articles);
+    });
+});
+
+// Роўт для атрымання артыкула па ID
+app.get('/articles/:id', (req, res) => {
+    const articleId = parseInt(req.params.id);
+    fs.readFile(FILE_PATH, 'utf-8', (err, data) => {
+        if (err) {
+            res.status(500).send({ error: 'Не ўдалося прачытаць файл' });
+            return;
+        }
+        const articles = JSON.parse(data);
+        const article = articles.find(a => a.id === articleId);
+        if (!article) {
+            res.status(404).send({ error: 'Артыкул не знойдзены' });
+            return;
+        }
+        res.send(article);
+    });
+});
+
+
 // Start server
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
