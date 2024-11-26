@@ -160,9 +160,10 @@ io.on('connection', (socket) => {
 
   socket.on('load history', ({ offset }, callback) => {
     const limit = 20;
-    const messages = getChatMessages().slice(-offset - limit, -offset);
+    const messages = getChatMessages().slice(offset, offset + limit);  // Вяртаем паведамленні, пачынаючы з offset
     callback(messages);
 });
+
 
 });
 
