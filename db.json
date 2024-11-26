@@ -1,20 +1,20 @@
 [
     {
       "id": 1,
-      "username": "vil488",
-      "password": "$2a$12$G22KJD5Q9oqFlp8sJi8kZOOrh3vUAQDlBSg3scKWy3rbN0.E8aX7O",
+      "username": "Vil",
+      "password": "$2a$12$snVPb66nKVkhuLC6LbBJleDhueWOAvXGozk.xv7XmEph2FmQJPf02",
       "color": "#8B5DFF"
     },
 
     {
         "id":2,
-        "username":"evelina",
-        "password":"$2a$12$L8rvqXkMawG6baP206Z2deV.xdBiXa42Nf0e9WjXPQVRp.NMbPLEW",
+        "username":"Evelina",
+        "password":"$2a$12$Z2LGw9lhSfr.fOmpJZG2FO6slH0TTbmqAcOKX8bpKMp4URA/tmRS.",
         "color": "#AF47D2"
     },
     {
         "id":3,
-        "username":"alice",
+        "username":"Alice",
         "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW",
         "color": "#FF3EA5"
     }
