@@ -3,20 +3,23 @@
       "id": 1,
       "username": "Vil",
       "password": "$2a$12$snVPb66nKVkhuLC6LbBJleDhueWOAvXGozk.xv7XmEph2FmQJPf02",
-      "color": "#8B5DFF"
+      "color": "#8B5DFF",
+      "role": "user"
     },
 
     {
         "id":2,
         "username":"Evelina",
         "password":"$2a$12$Z2LGw9lhSfr.fOmpJZG2FO6slH0TTbmqAcOKX8bpKMp4URA/tmRS.",
-        "color": "#AF47D2"
+        "color": "#AF47D2",
+        "role": "user"
     },
     {
         "id":3,
         "username":"Alice",
         "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW",
-        "color": "#FF3EA5"
+        "color": "#FF3EA5",
+        "role": "user"
     }
 ]
   
