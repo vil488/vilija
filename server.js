@@ -152,6 +152,14 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.user.username}`);
   });
+
+
+  socket.on('load history', async ({ offset }, callback) => {
+    const limit = 20; // Колькасць паведамленняў за раз
+    const messages = getChatMessages().slice(offset, offset + limit);
+    callback(messages);
+  });
+  
 });
 
 // Маршрут для ачысткі ўсіх паведамленняў
@@ -167,7 +175,12 @@ app.delete('/clearMessages', (req, res) => {
     console.error('Error clearing messages:', err);
     res.status(500).json({ success: false, message: 'Не ўдалося выдаліць паведамленні' });
   }
+
+
+  
 });
+
+
 
 
 
