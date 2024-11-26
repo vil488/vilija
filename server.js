@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const winston = require('winston');
 require('dotenv').config();
-
+const CryptoJS = require('crypto-js'); 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -162,7 +162,8 @@ io.on('connection', (socket) => {
     const limit = 20;
     const messages = getChatMessages().slice(-offset - limit, -offset);
     callback(messages);
-  });
+});
+
 });
 
 // --- Articles ---
