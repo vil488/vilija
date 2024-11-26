@@ -123,6 +123,21 @@ io.use((socket, next) => {
   }
 });
 
+
+
+
+const getPaginatedMessages = (offset, limit) => {
+  try {
+    const messages = getChatMessages(); // Загружаем усе паведамленні з файла
+    const start = Math.max(messages.length - offset - limit, 0); // Вылічваем пачатак
+    const end = messages.length - offset; // Вылічваем канец
+    return messages.slice(start, end); // Вяртаем патрэбны фрагмент
+  } catch (err) {
+    console.error('Error getting paginated messages:', err);
+    return [];
+  }
+};
+
 // WebSocket events
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.user.username}`);
@@ -154,13 +169,14 @@ io.on('connection', (socket) => {
   });
 
 
-  socket.on('load history', async ({ offset }, callback) => {
+  socket.on('load history', ({ offset }, callback) => {
     const limit = 20; // Колькасць паведамленняў за раз
-    const messages = getChatMessages().slice(offset, offset + limit);
-    callback(messages);
+    const messages = getPaginatedMessages(offset, limit); // Атрымліваем патрэбную частку
+    callback(messages); // Адпраўляем іх кліенту
   });
-  
 });
+  
+
 
 // Маршрут для ачысткі ўсіх паведамленняў
 app.delete('/clearMessages', (req, res) => {
