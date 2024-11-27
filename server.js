@@ -119,6 +119,28 @@ app.post('/refresh-token', (req, res) => {
   }
 });
 
+
+app.delete('/clearMessages', (req, res) => {
+  try {
+    // Ачышчаем ўсе паведамленні
+    const data = { messages: [] };
+    fs.writeFileSync('./dbc.json', JSON.stringify(data, null, 2));
+
+    // Адпраўляем адказ
+    res.status(200).json({ success: true, message: 'Паведамленні былі выдаленыя' });
+  } catch (err) {
+    console.error('Error clearing messages:', err);
+    res.status(500).json({ success: false, message: 'Не ўдалося выдаліць паведамленні' });
+  }
+
+  
+});
+
+
+
+
+
+
 // --- WebSocket functionality ---
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
