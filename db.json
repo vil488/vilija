@@ -2,7 +2,7 @@
     {
       "id": 1,
       "username": "Vil",
-      "password": "$2a$12$snVPb66nKVkhuLC6LbBJleDhueWOAvXGozk.xv7XmEph2FmQJPf02",
+      "password": "$2a$12$vEt3RmLtle7OcNcoe7q0iei3rw8s98fbWo5vnhnimzQkyqhYHFcdK",
       "color": "#8B5DFF",
       "role": "user"
     },
@@ -17,9 +17,16 @@
     {
         "id":3,
         "username":"Alice",
-        "password":"$2b$12$UsJejqSr0zPlmBcIeGyBXOyqcw7Mr23WoZOFGL6dcLBI8sr7/KsgW",
+        "password":"$2a$12$Npt0AW9REld4WwFbrj4p3OWBn0E4N9UZdiM09d21U/JxOsbnz9uqO",
         "color": "#FF3EA5",
         "role": "user"
+    },
+    {
+      "id": 4,
+      "username": "Aleh",
+      "password": "$2a$12$XVo34FwRBgl9SC.EDAvsZuq29bWFIPVxPi0Eomo95ukRpvGHExvr6",
+      "color": "#FFC700",
+      "role": "user"
     }
 ]
   
