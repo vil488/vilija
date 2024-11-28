@@ -196,13 +196,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('load history', ({ offset }, callback) => {
-    const limit = 20; // Колькасць паведамленняў для падгрузкі
+    const limit = 20;
     const messages = getChatMessages()
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Сартоўка ад новых да старых
-        .slice(offset, offset + limit); // Вяртаем патрэбныя паведамленні
-
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Сартыруем ад апошніх да самых ранніх
+        .slice(offset, offset + limit);
     callback(messages);
 });
+
 
 
 
