@@ -120,6 +120,10 @@ app.post('/refresh-token', (req, res) => {
 });
 
 
+
+
+
+
 app.delete('/clearMessages', (req, res) => {
   try {
     // Ачышчаем ўсе паведамленні
@@ -136,8 +140,18 @@ app.delete('/clearMessages', (req, res) => {
   
 });
 
+      const SECRET_KEY_CHAT = process.env.SECRET_KEY_CHAT //той жа код што і ў крыстальніка для дышэфроўкі
 
+      app.get('/get-key', (req, res) => {
+        
+        const keyToSend = process.env.SECRET_KEY_USER; //cам ключ шыфравання чату
 
+        // Шыфраванне ключа
+        const encryptedKey = CryptoJS.AES.encrypt(keyToSend, SECRET_KEY_CHAT).toString();
+
+        // Адправіць зашыфраваны ключ фронтэнду
+        res.json({ key: encryptedKey });
+      });
 
 
 
