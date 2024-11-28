@@ -177,18 +177,19 @@ io.on('connection', (socket) => {
 
   socket.on('message', (data) => {
     const message = {
-      sender: socket.user.username,
-      text: data.text,
-      color: socket.user.color,
-      timestamp: new Date().toISOString(),
+        sender: socket.user.username,
+        text: data.text,
+        color: socket.user.color,
+        timestamp: new Date().toISOString(),
     };
 
     const messages = getChatMessages();
     messages.push(message);
     saveChatMessages(messages);
 
-    io.emit('message', message);
-  });
+    io.emit('message', message); // Адпраўляем паведамленне ўсім кліентам
+});
+
 
   socket.on('disconnect', () => {
     logger.info(`User disconnected: ${socket.user.username}`);
@@ -197,11 +198,12 @@ io.on('connection', (socket) => {
   socket.on('load history', ({ offset }, callback) => {
     const limit = 20; // Колькасць паведамленняў для падгрузкі
     const messages = getChatMessages()
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Сарціроўка ад апошніх да старых
-        .slice(offset, offset + limit); // Вяртаем патрэбную колькасць
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Сартоўка ад новых да старых
+        .slice(offset, offset + limit); // Вяртаем патрэбныя паведамленні
 
     callback(messages);
 });
+
 
 
 
