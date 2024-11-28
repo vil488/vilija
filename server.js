@@ -195,22 +195,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('load history', ({ offset }, callback) => {
-    const limit = 20;
+    const limit = 20; // Колькасць паведамленняў для падгрузкі
+    const messages = getChatMessages()
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Сарціроўка ад апошніх да старых
+        .slice(offset, offset + limit); // Вяртаем патрэбную колькасць
 
-    // Атрымаць усе паведамленні і сартыраваць па `timestamp`
-    const allMessages = getChatMessages().sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-    // Калі offset перавышае колькасць паведамленняў, вяртаем пусты масіў
-    if (offset >= allMessages.length) {
-        return callback([]);
-    }
-
-    // Абмежаваць колькасць паведамленняў
-    const messagesToReturn = allMessages.slice(offset, offset + limit);
-
-    // Вярнуць паведамленні
-    callback(messagesToReturn);
+    callback(messages);
 });
+
 
 
 
