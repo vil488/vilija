@@ -19,6 +19,8 @@ const io = new Server(server, {
   },
 });
 
+app.set('trust proxy', true);
+
 const PORT = 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 const FILE_PATH_USERS = './db.json';
