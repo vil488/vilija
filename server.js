@@ -205,6 +205,27 @@ io.on('connection', (socket) => {
 });
 
 
+// Эндпойнт для праверкі, ці карыстальнік з'яўляецца адмінам
+app.get('/check-admin', (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1]; // Атрымаць токен з загалоўка
+
+  if (!token) {
+      return res.status(401).json({ message: 'Access denied, no token provided' });
+  }
+
+  try {
+      // Дэкодзіруем токен
+      const decoded = jwt.verify(token, SECRET_KEY);
+      // Калі роля карыстальніка "admin"
+      if (decoded.role === 'admin') {
+          return res.json({ isAdmin: true });
+      } else {
+          return res.json({ isAdmin: false });
+      }
+  } catch (err) {
+      return res.status(400).json({ message: 'Invalid token' });
+  }
+});
 
 
 
