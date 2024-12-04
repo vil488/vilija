@@ -103,7 +103,8 @@ app.post('/login', async (req, res) => {
   }
 
   const token = jwt.sign({ username: user.username, color: user.color, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-  res.status(200).json({ token, username: user.username, color: user.color });
+  res.status(200).json({ token, username: user.username, color: user.color, role: user.role });
+
 });
 
 // Абнаўленне токена
