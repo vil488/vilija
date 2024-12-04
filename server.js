@@ -210,7 +210,7 @@ io.on('connection', (socket) => {
 
 });
 
-// --- Articles ---
+// Атрымаць усе артыкулы
 app.get('/articles', (req, res) => {
   fs.readFile('./dba.json', 'utf-8', (err, data) => {
     if (err) return res.status(500).json({ error: 'Error reading file' });
@@ -218,6 +218,7 @@ app.get('/articles', (req, res) => {
   });
 });
 
+// Атрымаць адзін артыкул па ID
 app.get('/articles/:id', (req, res) => {
   const articleId = parseInt(req.params.id);
   fs.readFile('./dba.json', 'utf-8', (err, data) => {
@@ -228,6 +229,39 @@ app.get('/articles/:id', (req, res) => {
     res.send(article);
   });
 });
+
+// Дадаць новы артыкул
+app.post('/newarticle', (req, res) => {
+  const newArticle = req.body; // Атрымаць дадзеныя з цела запыту
+
+  // Праверыць, ці ўсе неабходныя палі ёсць
+  if (!newArticle.title || !newArticle.content || !newArticle.author || !newArticle.date) {
+    return res.status(400).json({ error: 'All fields are required: title, content, author, date' });
+  }
+
+  // Чытаем існуючыя артыкулы
+  fs.readFile('./dba.json', 'utf-8', (err, data) => {
+    if (err) return res.status(500).json({ error: 'Error reading file' });
+
+    let articles = JSON.parse(data);
+
+    // Ствараем новы ID
+    const newId = articles.length > 0 ? articles[articles.length - 1].id + 1 : 1;
+
+    // Дадаем ID да новага артыкула
+    newArticle.id = newId;
+
+    // Дадаем новы артыкул у спіс
+    articles.push(newArticle);
+
+    // Захоўваем абноўлены спіс у файл
+    fs.writeFile('./dba.json', JSON.stringify(articles, null, 2), (err) => {
+      if (err) return res.status(500).json({ error: 'Error writing file' });
+      res.status(201).json({ message: 'Article added successfully', article: newArticle });
+    });
+  });
+});
+
 
 // --- Start server ---
 server.listen(PORT, () => {
