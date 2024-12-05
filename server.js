@@ -25,6 +25,8 @@ const PORT = 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 const FILE_PATH_USERS = './db.json';
 const FILE_PATH_MESSAGES = './dbc.json';
+const FILE_PATH_ARTICLES = './dba.json'; 
+
 
 // --- Middlewares ---
 app.use(cors({
