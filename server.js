@@ -19,7 +19,7 @@ const io = new Server(server, {
   },
 });
 
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 const PORT = 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -213,57 +213,87 @@ io.on('connection', (socket) => {
 
 
 });
+// --- Utility functions ---
+const getArticles = () => {
+  try {
+    // Калі файл не існуе, ствараем яго са стандартнымі дадзенымі
+    if (!fs.existsSync(FILE_PATH_ARTICLES)) {
+      fs.writeFileSync(FILE_PATH_ARTICLES, JSON.stringify([]));
+    }
+    const data = fs.readFileSync(FILE_PATH_ARTICLES, 'utf8');
+    return JSON.parse(data) || [];
+  } catch (err) {
+    console.error('Error reading articles:', err);
+    return [];
+  }
+};
 
+const saveArticles = (articles) => {
+  try {
+    fs.writeFileSync(FILE_PATH_ARTICLES, JSON.stringify(articles, null, 2));
+  } catch (err) {
+    console.error('Error saving articles:', err);
+  }
+};
+
+// --- Routes ---
 // Атрымаць усе артыкулы
 app.get('/articles', (req, res) => {
-  fs.readFile('./dba.json', 'utf-8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Error reading file' });
-    res.send(JSON.parse(data));
-  });
+  try {
+    const articles = getArticles();
+    res.status(200).json(articles);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching articles' });
+  }
 });
 
 // Атрымаць адзін артыкул па ID
 app.get('/articles/:id', (req, res) => {
-  const articleId = parseInt(req.params.id);
-  fs.readFile('./dba.json', 'utf-8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Error reading file' });
-    const articles = JSON.parse(data);
+  const articleId = parseInt(req.params.id, 10); // Атрымаем ID і пераўтворым у лік
+  if (isNaN(articleId)) {
+    return res.status(400).json({ error: 'Invalid article ID' });
+  }
+
+  try {
+    const articles = getArticles();
     const article = articles.find((a) => a.id === articleId);
-    if (!article) return res.status(404).json({ error: 'Article not found' });
-    res.send(article);
-  });
+
+    if (!article) {
+      return res.status(404).json({ error: 'Article not found' });
+    }
+
+    res.status(200).json(article);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching article' });
+  }
 });
 
 // Дадаць новы артыкул
 app.post('/newarticle', (req, res) => {
-  const newArticle = req.body; // Атрымаць дадзеныя з цела запыту
+  const { title, content, author, date } = req.body;
 
-  // Праверыць, ці ўсе неабходныя палі ёсць
-  if (!newArticle.title || !newArticle.content || !newArticle.author || !newArticle.date) {
+  // Праверка на наяўнасць усіх неабходных палёў
+  if (!title || !content || !author || !date) {
     return res.status(400).json({ error: 'All fields are required: title, content, author, date' });
   }
 
-  // Чытаем існуючыя артыкулы
-  fs.readFile('./dba.json', 'utf-8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Error reading file' });
-
-    let articles = JSON.parse(data);
+  try {
+    const articles = getArticles();
 
     // Ствараем новы ID
     const newId = articles.length > 0 ? articles[articles.length - 1].id + 1 : 1;
 
-    // Дадаем ID да новага артыкула
-    newArticle.id = newId;
-
-    // Дадаем новы артыкул у спіс
+    // Дадаем новы артыкул
+    const newArticle = { id: newId, title, content, author, date };
     articles.push(newArticle);
 
-    // Захоўваем абноўлены спіс у файл
-    fs.writeFile('./dba.json', JSON.stringify(articles, null, 2), (err) => {
-      if (err) return res.status(500).json({ error: 'Error writing file' });
-      res.status(201).json({ message: 'Article added successfully', article: newArticle });
-    });
-  });
+    // Захоўваем спіс артыкулаў у файл
+    saveArticles(articles);
+
+    res.status(201).json({ message: 'Article added successfully', article: newArticle });
+  } catch (err) {
+    res.status(500).json({ error: 'Error saving article' });
+  }
 });
 
 
